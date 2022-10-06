@@ -2,4 +2,6 @@ First_Solution
 
 STATUS=TerminateInstances
 USER=serdar
+cat event_history.csv | grep -i serdar | grep -i terminateinstances | cut -d',' -f 10 | cut -d':' -f 2 | tr '""' ' ' | tr '}]' ' ' | tee result.txt
 cat event_history.csv | grep $STATUS | grep $USER | cut -d',' -f 10 | cut -d':' -f 2 | sed 's/""//' | sed 's/""}//' | sed 's/]"//' | tee result.txt
+cat event_history.csv | grep -i serdar | grep -i terminateinstances | grep -Eo "i-[a-zA-Z0-9]{17}" | sort | uniq > result.txt 
