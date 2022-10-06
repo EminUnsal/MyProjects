@@ -2,6 +2,10 @@
 
 # Check if we are root privilage or not
 
+if [[ $UID != 0 ]]; then
+    echo "You don't have superuser privileges. Make sure to run script as root user."
+    exit 1
+fi
 
 # Which files are we going to back up. Please make sure to exist /home/ec2-user/data file
  
