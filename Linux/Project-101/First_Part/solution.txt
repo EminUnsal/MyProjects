@@ -1,0 +1,5 @@
+First_Solution
+
+STATUS=TerminateInstances
+USER=serdar
+cat event_history.csv | grep $STATUS | grep $USER | cut -d',' -f 10 | cut -d':' -f 2 | sed 's/""//' | sed 's/""}//' | sed 's/]"//' | tee result.txt
