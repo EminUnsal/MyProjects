@@ -1,0 +1,3 @@
+MYPEM=$(cat certificate.pem)
+
+echo -e $MYPEM> new.pem
