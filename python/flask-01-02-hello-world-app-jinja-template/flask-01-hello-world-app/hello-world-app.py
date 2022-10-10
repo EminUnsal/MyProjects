@@ -4,8 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def head():
-    return "<h1>Hello World Armando This is from Clarusway DE</h1>"
-
+    return "<h1>Hello Everyone This is from Clarusway DE</h1>"
 
 @app.route('/second')
 def second():
@@ -15,11 +14,9 @@ def second():
 def third():
     return "This is the subpage of third page"
 
-
 @app.route('/forth/<string:id>')
 def forth(id):
     return f'Id of this page is {id}'
-
 
 
 if __name__ == '__main__':
