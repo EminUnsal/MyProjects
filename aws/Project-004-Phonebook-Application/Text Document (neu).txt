@@ -1,1 +1,3 @@
 phonebook-app.py DATABASE_PASSWORD
+cfn-template.yaml  under Userdata: TOKEN and FOLDER 
+                         MyDatabaseServer:MasterUserPassword
