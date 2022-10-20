@@ -16,7 +16,7 @@ def head():
 @app.route("/Armando")
 def header():
     names =["Armando", "Sam", "Jasper"]
-    # numbers = range(1.11)
+    # numbers = range(1, 11)
     return render_template("body.html", object = names)
 
 
