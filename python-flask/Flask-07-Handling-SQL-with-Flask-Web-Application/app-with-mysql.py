@@ -6,9 +6,9 @@ from flaskext.mysql import MySQL
 app = Flask(__name__)
 
 # Configure mysql database
-app.config['MYSQL_DATABASE_HOST'] = 'Enter the Endpoint'
+app.config['MYSQL_DATABASE_HOST'] = 'vincenzo.cbanmzptkrzf.us-east-1.rds.amazonaws.com'
 app.config['MYSQL_DATABASE_USER'] = 'admin'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Enter a password'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Clarusway_1'
 app.config['MYSQL_DATABASE_DB'] = 'clarusway'
 app.config['MYSQL_DATABASE_PORT'] = 3306
 mysql = MySQL()
@@ -35,10 +35,8 @@ VALUES
     ("Betul", "betul@google.com"),
     ("Sparkle", "sparkle@bmw.com"),
     ("Yildiz", "yildiz@mercedes.com"),
-    ("Mehmet", "mehmet@porche.com"),
+	("Mehmet", "mehmet@porche.com"),
     ("Tugba", "tugba@tesla.com"),
-    ("Murat", "murat@tesla.com"),
-    ("Sergen", "sergen@tesla.com"),
     ("Kemal", "kemal@samsung.com");
 """
 cursor.execute(drop_table)
