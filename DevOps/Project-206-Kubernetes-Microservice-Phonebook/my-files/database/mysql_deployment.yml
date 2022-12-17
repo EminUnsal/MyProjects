@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project206-deploy-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project206-db
+  template:
+    metadata:
+      labels:
+        app: project206-db
+    spec:
+      containers:
+      - name: mysql-from-hub
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+          - name: claim
+            mountPath: /var/lib/mysql
+        env:
+        - name: MYSQL_DATABASE_HOST
+          value: mysql
+        - name:  MYSQL_USER
+          value: mehmet
+        - name:  MYSQL_DATABASE
+          value: my-db
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-for-db
+              key: password       
+      volumes:
+        - name: claim
+          persistentVolumeClaim:
+            claimName: project206-pv-db
+      restartPolicy: Never      

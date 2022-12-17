@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: project206-pv-db
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: project206-pv-db
+spec:  
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-for-db
+type: Opaque
+data:
+  username: bWVobWV0Cg==
+  password: c2lmcmUK
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app: project206-db
+  type: ClusterIP
+  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project206-deploy-db
+spec:
+  selector:
+    matchLabels:
+      app: project206-db
+  template:
+    metadata:
+      labels:
+        app: project206-db
+    spec:
+      containers:
+      - name: mysql-from-hub
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+      env:
+      - name: SECRET_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: secret-for-db
+            key: username
+      - name: SECRET_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: secret-for-db
+            key: password       
+        volumes:
+          - name: claim
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: claim
+          persistentVolumeClaim:
+            claimName: project206-pv-db
+      restartPolicy: Never      

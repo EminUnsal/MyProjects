@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: project206-pv-db
+spec:  
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
