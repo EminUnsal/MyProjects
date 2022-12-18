@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-result-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp1
+  template:
+    metadata:
+      labels:
+        app: myapp1
+    spec:
+      containers:
+      - name: result-server
+        image: mehmet2020/result-server
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: secret-for-db
+        - configMapRef:
+            name: db-config
