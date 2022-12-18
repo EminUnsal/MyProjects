@@ -20,18 +20,11 @@ spec:
         volumeMounts:
           - name: claim
             mountPath: /var/lib/mysql
-        env:
-        - name: MYSQL_DATABASE_HOST
-          value: mysql
-        - name:  MYSQL_USER
-          value: mehmet
-        - name:  MYSQL_DATABASE
-          value: my-db
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-for-db
-              key: password       
+        envFrom:
+        - secretRef:
+            name: secret-for-db
+        - configMapRef:
+            name: db-config
       volumes:
         - name: claim
           persistentVolumeClaim:
