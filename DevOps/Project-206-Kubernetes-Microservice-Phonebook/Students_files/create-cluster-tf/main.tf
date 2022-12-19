@@ -25,7 +25,7 @@ locals {
 
 resource "aws_instance" "master" {
   ami                  = "ami-08d4ac5b634553e16"
-  instance_type        = "t3a.medium"
+  instance_type        = "t3a.small"
   key_name             = var.key-name
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
   vpc_security_group_ids = [ aws_security_group.tf-k8s-master-sec-gr.id ]
