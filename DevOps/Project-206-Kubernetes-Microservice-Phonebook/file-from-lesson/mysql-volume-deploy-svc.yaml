@@ -44,13 +44,35 @@ spec:
         resources:
         env:
           - name: MYSQL_ROOT_PASSWORD
-            value: Qwer1234
-          - name: MYSQL_DATABASE
-            value: phonebook
-          - name: MYSQL_USER
-            value: mehmet
+            valueFrom:
+              secretKeyRef:
+                name:  mysql-secret
+                key:  rootpassword
           - name: MYSQL_PASSWORD
-            value: Mehmet20.  
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: userpassword
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-configmap
+                key: databasename
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: mysql-configmap
+                key: username
+          
+        # env:
+        #   - name: MYSQL_ROOT_PASSWORD
+        #     value: Qwer1234
+        #   - name: MYSQL_DATABASE
+        #     value: phonebook
+        #   - name: MYSQL_USER
+        #     value: mehmet
+        #   - name: MYSQL_PASSWORD
+        #     value: Mehmet20.  
         ports:
         - containerPort: 3306
         volumeMounts:
