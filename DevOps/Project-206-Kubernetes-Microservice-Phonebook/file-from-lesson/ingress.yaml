@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: phonebook
+  labels:
+    name: phonebook
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  # - host: <Host>      For CloudProvider 
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: webserver-service
+            port: 
+              number: 80
+      - pathType: Prefix
+        path: "/result"
+        backend:
+          service:
+            name: resultserver-service
+            port: 
+              number: 80

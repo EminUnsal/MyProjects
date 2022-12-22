@@ -15,15 +15,15 @@ spec:
       containers:
       - name: resultserver-pods
         image: mehmet2020/result-server
+        envFrom:
+          - configMapRef:
+              name: server-config
         env:
-          - name: MYSQL_DATABASE_HOST
-            value: mysql-service
-          - name: MYSQL_USER
-            value: mehmet 
           - name: MYSQL_PASSWORD
-            value: Mehmet20.  
-          - name: MYSQL_DATABASE
-            value: phonebook
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: userpassword
         ports:
         - containerPort: 80
 ---
@@ -40,3 +40,12 @@ spec:
     targetPort: 80
     nodePort: 30002
 
+        # env:
+        #   - name: MYSQL_DATABASE_HOST
+        #     value: mysql-service
+        #   - name: MYSQL_USER
+        #     value: mehmet 
+        #   - name: MYSQL_PASSWORD
+        #     value: Mehmet20.  
+        #   - name: MYSQL_DATABASE
+        #     value: phonebook

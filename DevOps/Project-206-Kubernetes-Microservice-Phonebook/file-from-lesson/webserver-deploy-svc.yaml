@@ -16,14 +16,23 @@ spec:
       - name: webserver-pods
         image: mehmet2020/web-server
         env:
-          - name: MYSQL_DATABASE_HOST
-            value: mysql-service
-          - name: MYSQL_USER
-            value: mehmet 
           - name: MYSQL_PASSWORD
-            value: Mehmet20.  
-          - name: MYSQL_DATABASE
-            value: phonebook
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: userpassword
+        envFrom:
+          - configMapRef:
+              name: server-config
+        # env:
+        #   - name: MYSQL_DATABASE_HOST
+        #     value: mysql-service
+        #   - name: MYSQL_USER
+        #     value: mehmet 
+        #   - name: MYSQL_PASSWORD
+        #     value: Mehmet20.  
+        #   - name: MYSQL_DATABASE
+        #     value: phonebook
         ports:
         - containerPort: 80
 ---
