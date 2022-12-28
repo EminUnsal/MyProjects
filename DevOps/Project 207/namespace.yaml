@@ -1,0 +1,10 @@
+#kubectl create ns test
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: production

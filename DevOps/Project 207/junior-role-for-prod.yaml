@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: binding-for-pod-junior
+  namespace: production
+subjects:
+- kind: Group
+  name: junior # UserName
+  apiGroup: rbac.authorization.k8s.io
+# - kind: User
+#   name: mehmet # UserName
+#   apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: view
+  apiGroup: rbac.authorization.k8s.io
+
+# ClusterRole ns bazinda atanabilir
+# Junior isimli grupta production isimli ns'inde edit isimli ClusterRole kullanilsin

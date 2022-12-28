@@ -1,0 +1,41 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: test
+  name: junior-test-ns
+rules:
+- apiGroups: [ "" ] # '' indicates the core API group
+  resources: ["*"] # services,secrets,pods,namespace,pods/log
+  verbs: ["*"] # Http request-->get,list,update,watch...
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: binding-for-test-junior
+  namespace: test
+subjects:
+- kind: Group
+  name: junior # UserName
+  apiGroup: rbac.authorization.k8s.io
+# - kind: User
+#   name: mehmet # UserName
+#   apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: junior-test-ns
+  apiGroup: rbac.authorization.k8s.io
+# ---
+# ***As alternative***
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: binding-for-pod-junior
+#   namespace: test
+# subjects:
+# - kind: Group
+#   name: junior 
+#   apiGroup: rbac.authorization.k8s.io
+# roleRef:
+#   kind: ClusterRole
+#   name: edit
+#   apiGroup: rbac.authorization.k8s.io
