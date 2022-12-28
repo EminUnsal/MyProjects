@@ -1,0 +1,155 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-claim
+  namespace: production
+spec:
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-claim
+  namespace: production
+spec:
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-wordpress
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: wp
+  strategy:
+    type: Recreate #RollingUpdate-->.rollingUpdate.maxUnavailable and .rollingUpdate.maxSurge
+  template:
+    metadata:
+      labels:
+        app: wp
+    spec:
+      containers:
+      - name: website
+        image: wordpress:latest
+        env:
+          - name: WORDPRESS_DB_HOST
+            value: my-db-svc-prod
+
+          - name: WORDPRESS_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: user
+
+          - name: WORDPRESS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: userpassword
+
+          - name: WORDPRESS_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: database
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "250m"
+        
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-database
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: database
+        image: mysql:5.6
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: root
+
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: user
+
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: userpassword
+
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name:  my-secret
+                key: database
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "250m"
+        
+        ports:
+        - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-wp-svc-prod
+  namespace: production
+spec:
+  type: ClusterIP
+  selector:
+    app: wp
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-db-svc-prod
+  namespace: production
+spec:
+  type: ClusterIP
+  selector:
+    app: db
+  ports:
+  - port: 3306
+    targetPort: 3306
+
+
+
