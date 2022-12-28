@@ -9,4 +9,6 @@ kubectl label no $node2 env=prod
 kubectl label no $node3 env=prod
 
 kubectl get no -o jsonpath="{.items[1].status.addresses}"
-As Example=kubectl get no -o jsonpath="{.items[1].status.addresses[0].address}"
+
+
+Exercise=kubectl get no -o jsonpath="{.items[1].status.addresses[0].address}"
