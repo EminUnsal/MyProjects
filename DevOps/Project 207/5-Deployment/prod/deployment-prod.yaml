@@ -151,6 +151,14 @@ spec:
         - name: mysql-pv-test
           persistentVolumeClaim:
             claimName: mysql-claim
+      nodeSelector:
+        env: production
+      tolerations:
+      - key: env
+        operator: Equal
+        value: production
+        effect: "NoSchedule"
+
 ---
 apiVersion: v1
 kind: Service
