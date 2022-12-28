@@ -121,13 +121,11 @@ spec:
               secretKeyRef:
                 name:  my-secret
                 key: root
-
           - name: MYSQL_USER
             valueFrom:
               secretKeyRef:
                 name:  my-secret
                 key: user
-
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:

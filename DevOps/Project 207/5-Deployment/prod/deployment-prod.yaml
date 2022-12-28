@@ -82,6 +82,13 @@ spec:
         - name: wp-pv-test
           persistentVolumeClaim:
             claimName: wp-claim
+      nodeSelector:
+        env: prod
+      tolerations:
+      - key: env
+        operator: Equal
+        value: prod
+        effect: "NoSchedule"
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -152,11 +159,11 @@ spec:
           persistentVolumeClaim:
             claimName: mysql-claim
       nodeSelector:
-        env: production
+        env: prod
       tolerations:
       - key: env
         operator: Equal
-        value: production
+        value: prod
         effect: "NoSchedule"
 
 ---
