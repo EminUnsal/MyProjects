@@ -75,6 +75,24 @@ spec:
         
         ports:
         - containerPort: 80
+        volumeMounts:
+          - name:  wp-pv-test
+            mountPath: /var/www/html/
+      volumes:
+        - name: wp-pv-test
+          persistentVolumeClaim:
+            claimName: wp-claim
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - db
+            topologyKey: kubernetes.io/hostname # ayni hostname'in uzerinde olusuyor
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -85,6 +103,8 @@ spec:
   selector:
     matchLabels:
       app: db
+  strategy:
+    type: Recreate #RollingUpdate-->.rollingUpdate.maxUnavailable and .rollingUpdate.maxSurge
   template:
     metadata:
       labels:
@@ -124,6 +144,13 @@ spec:
         
         ports:
         - containerPort: 3306
+        volumeMounts:
+          - name: mysql-pv-test
+            mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-pv-test
+          persistentVolumeClaim:
+            claimName: mysql-claim
 ---
 apiVersion: v1
 kind: Service
