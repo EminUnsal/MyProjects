@@ -1,0 +1,24 @@
+LivenessProbe -Container icindeki uygulamanin calisip calismadigini kontrol eden mekanizma.
+Uygulama calisiyor ama yapmasi gerkli olan islemi yapmiyor
+ReadinessProbe- Calismaya baslayan pod'un servise eklenmeye hazir olup olmadigini kontrol eden mekanizma
+
+Deployment'i guncelledigimizde nasil bir strateji izlenilecek
+Recreate-Tum podlar sistemden kaldirilir.Daha sonra degisiklik yapilmis podlar deploy edilir.
+Bir uygulamanin eski version ve yeni versionunun birlikte calismasi problem olusturabilecegi durumlarda
+RollingUpdate- Podlar belirtilen duruma gore yuklenecek ve silinecek
+maxSurge: 2 ayni anda kac tane ayaga kalkacak
+maxUnavailable: 0 ayni anda kac tane silinecek
+
+kubectl rollout history deployment <deploy-name>  ile deploymenttaki degisiklikleri gorebiliriz. ama ckomut 
+yazilirken sonuna --record eklenmesi gerekli
+kubectl rollout history deployment <deploy-name> --revision=<number> ile yapilan degisikligi ayrintili gorebiliriz
+kubectl rollout undo deployment <deploy-name> bir onceki degisiklige donebiliriz
+kubectl rollout undo deployment <deploy-name> --to-revision= <number> istedigim haline giderim
+kubectl rollout status deployment  <deploy-name> -w ile adim adim deploymentta ne oluyor takip edebiliriz
+kubectl rollout pause deployment <deploy-name>  dersem rollout islemi durur ve bir hata var ise yeni deploymentta kontrol edebilirim
+kubectl rollout resume deployment <deploy-name> deployment isine devam eder
+*RestartPolicy-->Always,On-failure,Never
+LivenessProbe
+
+terminationGracePeriodSeconds: 60 serviceden cikarilan podun kac saniye sonra terminate edilecegini belirtir. cunku hala islemesi gereken islemler olabilir
+

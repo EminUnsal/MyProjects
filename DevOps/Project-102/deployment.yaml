@@ -19,27 +19,21 @@ spec:
         app: myapp
     spec:
       # terminationGracePeriodSeconds: 60 serviceden cikarilan podun kac saniye sonra terminate edilecegini belirtir.
-      containers:
+      containers:                      # default 30s
       - name: myapp
         image: ozgurozturknet/k8s:v1
         livenessProbe:
           httpGet:
             path: /healthcheck     # localhostta bu path'a request gonderiliriyor.her uygulamada ayri
-            port: 8080
-            httpHeaders:
-            - name: Custom-Header
-              value: Awesome
-          initialDelaySeconds: 10 # pod calismaya basladiktan sonra on hazirllik icin bekleme suresi
-          periodSeconds: 5       # kac saniyede bir /healthcheck'e gidilecek
+            port: 80
+          initialDelaySeconds: 5 # pod calismaya basladiktan sonra on hazirllik icin bekleme suresi
+          periodSeconds: 5        # kac saniyede bir /healthcheck'e gidilecek
         readinessProbe:
           httpGet:
             path: /ready     
-            port: 8080
-            httpHeaders:
-            - name: Custom-Header
-              value: Awesome
-          initialDelaySeconds: 10 
-          periodSeconds: 5    
+            port: 80
+          initialDelaySeconds: 20
+          periodSeconds: 3    
         resources:
           limits:
             memory: "128Mi"
