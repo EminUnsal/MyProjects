@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-mongodb
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  serviceName: my-mongo-svc
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: mongodb
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: pvc-for-app
+          mountPath: /my/own/datadir
+  volumeClaimTemplates:
+  - metadata:
+      name: pvc-for-app
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-mongo-svc
+  volume.beta.kubernetes.io/storage-class: "default" # storageclass olusturdugumza isim kismina karsilik gelen yer
+spec:
+  clusterIP: None
+  selector:
+    app: myapp
+  ports:
+  - port: 27017
+    targetPort: 27017
+
