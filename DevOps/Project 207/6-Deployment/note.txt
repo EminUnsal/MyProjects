@@ -1,0 +1,4 @@
+NodePort ile kullanicilar app erisebilir, sayet app cloud uzerinden kullanicilara serve edilmemisse.ve Layer4
+LoadBalancer ile kullanicilar app erisebilir,sayet app cloud uzerinden serve ediliyorsa.Layer4
+Ingress.Layer7
+

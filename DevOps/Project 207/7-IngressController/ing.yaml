@@ -2,8 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-test
-  labels:
-    app: wp
   namespace: test
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -14,20 +12,18 @@ spec:
   - host: testblog.example.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: /
         backend:
           service:
             name: my-wp-svc-test
-            port:
+            port: 
               number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-prod
-  labels:
-    app: wp
   namespace: production
   annotations:
     kubernetes.io/ingress.class: nginx
@@ -38,10 +34,10 @@ spec:
   - host: companyblog.example.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
+      - pathType: Prefix
+        path: /
         backend:
           service:
             name: my-wp-svc-prod
-            port:
+            port: 
               number: 80

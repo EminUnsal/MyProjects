@@ -1,4 +1,0 @@
-NodePort ile kullanicilar app erisebilir, sayet app cloud uzerinden kullanicilara serve edilmemisse
-LoadBalancer ile kullanicilar app erisebilir,sayet app cloud uzerinden serve ediliyorsa
-Ingress
-
