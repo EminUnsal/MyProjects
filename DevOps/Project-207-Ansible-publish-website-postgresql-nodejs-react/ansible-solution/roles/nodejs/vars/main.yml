@@ -1,0 +1,4 @@
+nodejs_home: /home/ec2-user/ansible/ansible-project/nodejs
+container_path: /home/ec2-user/nodejs
+container_name: mehmet_nodejs
+image_name: mehmetcw/nodejs

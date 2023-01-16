@@ -1,0 +1,7 @@
+  - name: Launch react docker container
+    docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        ports:
+        - "3000:3000"

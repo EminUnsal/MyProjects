@@ -1,0 +1,4 @@
+postgre_home: /home/ec2-user/ansible/ansible-project/postgres
+postgre_container: /home/ec2-user/postgresql
+container_name: mehmet_postgre
+image_name: mehmetcw/postgre
