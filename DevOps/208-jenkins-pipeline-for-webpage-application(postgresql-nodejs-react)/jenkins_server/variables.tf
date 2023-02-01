@@ -1,5 +1,5 @@
 variable "mykey" {
-  default = "First_Key"
+  default = "tyler-team"
 }
 variable "myami" {
   default = "ami-026b57f3c383c2eec"
@@ -15,5 +15,5 @@ variable "jenkins-sg" {
 }
 
 variable "user" {
-  default = "Mehmet"
+  default = "tyler"
 }
