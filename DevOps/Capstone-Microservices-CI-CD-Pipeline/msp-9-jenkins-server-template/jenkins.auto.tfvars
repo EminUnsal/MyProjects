@@ -1,4 +1,4 @@
-mykey = "clarusway"
+mykey = "First_Key"
 ami = "ami-0947d2ba12ee1ff75"
 region = "us-east-1"
 instance_type = "t3a.medium"

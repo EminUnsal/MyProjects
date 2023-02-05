@@ -3,6 +3,7 @@
 ```yml
 Gitflow: https://www.youtube.com/watch?v=1SXpE08hvGs
 Gitflow: https://nvie.com/posts/a-successful-git-branching-model/
+Semantic Versioning: https://semver.org/spec/v2.0.0.html
 JaCoCo Sample Report: https://www.jacoco.org/jacoco/trunk/coverage/
 kompose installation: https://kompose.io/installation
 Kompose/User Guide: https://kompose.io/user-guide/#user-guide
