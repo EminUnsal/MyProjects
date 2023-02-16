@@ -66,18 +66,18 @@ This project aims to create full CI/CD Pipeline for microservice based applicati
 
 ``` bash
 #! /bin/bash
-yum update -y
-hostnamectl set-hostname petclinic-dev-server
-amazon-linux-extras install docker -y
-systemctl start docker
-systemctl enable docker
-usermod -a -G docker ec2-user
-newgrp docker
-curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" \
+sudo yum update -y
+sudo hostnamectl set-hostname petclinic-dev-server
+sudo amazon-linux-extras install docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -a -G docker ec2-user
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" \
 -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-yum install git -y
-yum install java-11-amazon-corretto -y
+sudo chmod +x /usr/local/bin/docker-compose
+sudo yum install git -y
+sudo yum install java-11-amazon-corretto -y
+newgrp docker
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -123,7 +123,7 @@ git push origin main
   + Create `release` base branch.
 
     ```bash
-    git checkout main
+    git checkout dev
     git branch release
     git checkout release
     git push --set-upstream origin release
@@ -651,6 +651,7 @@ yum -y install terraform
 git add .
 git commit -m 'added jenkins server terraform files'
 git push --set-upstream origin feature/msp-9
+git checkout dev
 git merge feature/msp-9
 git push origin dev
 ```
@@ -793,7 +794,6 @@ git push origin dev
 python -m SimpleHTTPServer # for python 2.7
 python3 -m http.server # for python 3+
 ```
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## MSP 12 - Prepare Continuous Integration (CI) Pipeline
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -867,7 +867,6 @@ git checkout dev
 git merge feature/msp-12
 git push origin dev
 ```
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## MSP 13 - Prepare and Implement Selenium Tests
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -880,7 +879,7 @@ git branch feature/msp-13
 git checkout feature/msp-13
 ```
 
-* Create a folder for Selenium jobs with the name of `selenium-jobs` under `petclinic-microservices-with-db` folder.
+* Create a folder for Selenium jobs with the name of `selenium-jobs` under under `petclinic-microservices-with-db` folder.
 
 ``` bash
 mkdir selenium-jobs
@@ -932,9 +931,6 @@ driver.quit()
 
 ``` python
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from time import sleep
 import random
@@ -953,7 +949,6 @@ APP_IP = os.environ['MASTER_PUBLIC_IP']
 url = "http://"+APP_IP.strip()+":8080/"
 print(url)
 driver.get(url)
-sleep(3)
 owners_link = driver.find_element_by_link_text("OWNERS")
 owners_link.click()
 sleep(2)
@@ -1950,7 +1945,7 @@ ansible -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml all -m p
 ```yml
 apiVersion: kubeadm.k8s.io/v1beta3
 kind: ClusterConfiguration
-kubernetesVersion: v1.23.5
+kubernetesVersion: v1.25.6
 controlPlaneEndpoint: ${CONTROLPLANE_ENDPOINT}
 networking:
   podSubnet: 10.244.0.0/16
@@ -2019,7 +2014,7 @@ cgroupDriver: systemd
       curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
       echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
       apt-get update -q && \
-      apt-get install -qy kubelet=1.23.5-00 kubectl=1.23.5-00 kubeadm=1.23.5-00 docker.io
+      apt-get install -qy kubelet=1.23.5-00 kubectl=1.25.6-00 kubeadm=1.23.5-00 docker.io
 
   - name: Add ubuntu to docker group
     user:
@@ -2126,7 +2121,7 @@ cgroupDriver: systemd
       helm upgrade --install aws-cloud-controller-manager aws-cloud-controller-manager/aws-cloud-controller-manager --set image.tag=v1.20.0-alpha.0
       
   - name: Deploy Nginx Ingress 
-    shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/aws/deploy.yaml
+    shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml
 ```
 
 - Commit the change, then push the ansible playbooks to the remote repo.
@@ -2162,7 +2157,7 @@ terraform destroy -auto-approve -no-color
 
   * Click `Build Now`
 
-- After running the job above, replace the script with the one below to delete the existing test key pair using AWS CLI. (Click `Configure`)
+- After running the job above, replace the script with the one below in order to test deleting existing key pair using AWS CLI with following script. (Click `Configure`)
 
 ```bash
 PATH="$PATH:/usr/local/bin"
@@ -2788,10 +2783,9 @@ ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --extra-vars "wo
 pipeline {
     agent any
     environment {
-        PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/${APP_NAME}-app-dev"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         ANS_KEYPAIR="petclinic-${APP_NAME}-dev-${BUILD_NUMBER}.key"
@@ -3092,7 +3086,7 @@ eksctl create cluster -f cluster.yaml
 
 ```bash
 export PATH=$PATH:$HOME/bin
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3117,7 +3111,6 @@ git checkout feature/msp-20
       Command:
 ```
 ```bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-qa"
 AWS_REGION="us-east-1"
 
@@ -3304,10 +3297,9 @@ git checkout feature/msp-22
 pipeline {
     agent any
     environment {
-        PATH=sh(script:"echo $PATH:/usr/local/bin:$HOME/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/petclinic-app-qa"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
@@ -3578,17 +3570,18 @@ sudo apt-get install \
   curl \
   gnupg \
   lsb-release
-# Add Docker’s official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 # Use the following command to set up the stable repository
 echo \
-  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-# Update packages
+  # Update packages
 sudo apt-get update
 
 # Install and start Docker
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+# RKE is not compatible with the current Docker version (v23 hence we need to install an earlier version of Docker
+sudo apt-get install docker-ce=5:20.10.23~3-0~ubuntu-focal docker-ce-cli=5:20.10.23~3-0~ubuntu-focal containerd.io docker-compose-plugin
 sudo systemctl start docker
 sudo systemctl enable docker
 
@@ -3903,9 +3896,9 @@ nano /home/ec2-user/.m2/settings.xml
 git add .
 git commit -m 'added Nexus server terraform files'
 git push --set-upstream origin feature/msp-26
-git checkout dev
+git checkout release
 git merge feature/msp-26
-git push origin dev
+git push 
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -3943,7 +3936,6 @@ Worker            : checked
       Command:
 ```
 ``` bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-staging"
 AWS_REGION="us-east-1"
 
@@ -4038,10 +4030,9 @@ rancher --version
 pipeline {
     agent any
     environment {
-        PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/petclinic-app-staging"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         RANCHER_URL="https://rancher.clarusway.us"
@@ -4130,6 +4121,17 @@ pipeline {
 
 * Create an `A` record of `staging-petclinic.clarusway.us` in your hosted zone (in our case `clarusway.us`) using AWS Route 53 domain registrar and bind it to your `petclinic cluster`.
 
+* Commit the change, then push the script to the remote repo.
+
+``` bash
+git add .
+git commit -m 'added jenkinsfile petclinic-staging for release branch'
+git push --set-upstream origin feature/msp-27
+git checkout release
+git merge feature/msp-27
+git push
+```
+
 * Create a Staging ``Pipeline`` on Jenkins with name of `petclinic-staging` with following script and configure a `cron job` to trigger the pipeline every Sundays at midnight (`59 23 * * 0`) on `release` branch. `Petclinic staging pipeline` should be deployed on permanent staging-environment on `petclinic-cluster` Kubernetes cluster under `petclinic-staging-ns` namespace.
 
 ```yml
@@ -4147,19 +4149,11 @@ pipeline {
 * Click `save`.
 * Click `Build Now`
 
-* Commit the change, then push the script to the remote repo.
 
-``` bash
-git add .
-git commit -m 'added jenkinsfile petclinic-staging for release branch'
-git push --set-upstream origin feature/msp-27
-git checkout release
-git merge feature/msp-27
-git push origin release
-```
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 ## MSP 28 - Prepare a Production Pipeline
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 * Create `feature/msp-28` branch from `release`.
 
@@ -4169,18 +4163,44 @@ git branch feature/msp-28
 git checkout feature/msp-28
 ```
 
-* Create a Kubernetes ``cluster`` using Rancher with RKE and new nodes in AWS (on one EC2 instance only) and name it as `petclinic-cluster`.
+- Switch user to jenkins for creating eks cluster. Execute following commands as `jenkins` user.
 
-```yml
-Cluster Type      : Amazon EC2
-Name Prefix       : petclinic-k8s-instance
-Count             : 3
-etcd              : checked
-Control Plane     : checked
-Worker            : checked
+```bash
+sudo su - jenkins
 ```
 
-* Create `petclinic-prod-ns` namespace on `petclinic-cluster` with Rancher.
+- Create a `cluster.yaml` file under `/var/lib/jenkins` folder.
+
+```yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: petclinic-cluster
+  region: us-east-1
+availabilityZones: ["us-east-1a", "us-east-1b", "us-east-1c"]
+managedNodeGroups:
+  - name: ng-1
+    instanceType: t3a.medium
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
+    volumeSize: 8
+```
+
+- Create an EKS cluster via `eksctl`. It will take a while.
+
+```bash
+eksctl create cluster -f cluster.yaml
+```
+
+- After the cluster is up, run the following command to install `ingress controller`.
+
+```bash
+export PATH=$PATH:$HOME/bin
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.5.1/deploy/static/provider/cloud/deploy.yaml
+```
+
 
 * Create a ``Jenkins Job`` and name it as `create-ecr-docker-registry-for-petclinic-prod` to create Docker Registry for `Production` manually on AWS ECR.
 
@@ -4260,6 +4280,27 @@ docker push "${IMAGE_TAG_GRAFANA_SERVICE}"
 docker push "${IMAGE_TAG_PROMETHEUS_SERVICE}"
 ```
 
+- Prepare a script to deploy the application on QA environment and save it as `deploy_app_on_prod_environment.sh` under `jenkins` folder.
+
+```bash
+echo 'Deploying App on Kubernetes'
+envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml
+sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml
+AWS_REGION=$AWS_REGION helm repo add stable-petclinic s3://petclinic-helm-charts-<put-your-name>/stable/myapp/ || echo "repository name already exists"
+AWS_REGION=$AWS_REGION helm repo update
+helm package k8s/petclinic_chart
+AWS_REGION=$AWS_REGION helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic
+kubectl create ns petclinic-prod-ns || echo "namespace petclinic-prod-ns already exists"
+kubectl delete secret regcred -n petclinic-prod-ns || echo "there is no regcred secret in petclinic-prod-ns namespace"
+kubectl create secret generic regcred -n petclinic-prod-ns \
+    --from-file=.dockerconfigjson=/var/lib/jenkins/.docker/config.json \
+    --type=kubernetes.io/dockerconfigjson
+AWS_REGION=$AWS_REGION helm repo update
+AWS_REGION=$AWS_REGION helm upgrade --install \
+    petclinic-app-release stable-petclinic/petclinic_chart --version ${BUILD_NUMBER} \
+    --namespace petclinic-prod-ns
+```
+
 - At this stage, we will use ``Amazon RDS`` instead of mysql pod and service. Create a mysql database on AWS RDS.
 
 ```yml
@@ -4300,18 +4341,11 @@ spec:
 pipeline {
     agent any
     environment {
-        PATH=sh(script:"echo $PATH:/usr/local/bin", returnStdout:true).trim()
         APP_NAME="petclinic"
         APP_REPO_NAME="clarusway-repo/petclinic-app-prod"
-        AWS_ACCOUNT_ID=sh(script:'export PATH="$PATH:/usr/local/bin" && aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
+        AWS_ACCOUNT_ID=sh(script:'aws sts get-caller-identity --query Account --output text', returnStdout:true).trim()
         AWS_REGION="us-east-1"
         ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        RANCHER_URL="https://rancher.clarusway.us"
-        // Get the project-id from Rancher UI (petclinic-cluster-staging namespace, View in API, copy projectId )
-        RANCHER_CONTEXT="petclinic-cluster:project-id" 
-       //First part of projectID
-        CLUSTERID="petclinic-cluster"
-        RANCHER_CREDS=credentials('rancher-petclinic-credentials')
     }
     stages {
         stage('Package Application') {
@@ -4361,23 +4395,7 @@ pipeline {
         stage('Deploy App on Petclinic Kubernetes Cluster'){
             steps {
                 echo 'Deploying App on K8s Cluster'
-                sh "rancher login $RANCHER_URL --context $RANCHER_CONTEXT --token $RANCHER_CREDS_USR:$RANCHER_CREDS_PSW"
-                sh "envsubst < k8s/petclinic_chart/values-template.yaml > k8s/petclinic_chart/values.yaml"
-                sh "sed -i s/HELM_VERSION/${BUILD_NUMBER}/ k8s/petclinic_chart/Chart.yaml"
-                sh "rancher kubectl delete secret regcred -n petclinic-prod-ns || true"
-                sh """
-                rancher kubectl create secret generic regcred -n petclinic-prod-ns \
-                --from-file=.dockerconfigjson=$JENKINS_HOME/.docker/config.json \
-                --type=kubernetes.io/dockerconfigjson
-                """
-                sh "rm -f k8s/config"
-                sh "rancher cluster kf $CLUSTERID > k8s/config"
-                sh "chmod 400 k8s/config"
-                sh "helm repo add stable-petclinic s3://petclinic-helm-charts-<put-your-name>/stable/myapp/"
-                sh "helm package k8s/petclinic_chart"
-                sh "helm s3 push --force petclinic_chart-${BUILD_NUMBER}.tgz stable-petclinic"
-                sh "helm repo update"
-                sh "AWS_REGION=$AWS_REGION helm upgrade --install petclinic-app-release stable-petclinic/petclinic_chart --version ${BUILD_NUMBER} --namespace petclinic-prod-ns --kubeconfig k8s/config"
+                sh ". ./jenkins/deploy_app_on_prod_environment.sh"
             }
         }
     }
@@ -4442,18 +4460,6 @@ git checkout feature/msp-29
 
 * Configure TLS(SSL) certificate for `petclinic.clarusway.us` using `cert-manager` on petclinic K8s cluster with the following steps.
 
-* Log into Jenkins Server and configure the `kubectl` to connect to petclinic cluster by getting the `Kubeconfig` file from Rancher and save it as `$HOME/.kube/config` or set `KUBECONFIG` environment variable.
-
-```bash
-#create petclinic-config file under home folder(/home/ec2-user/.kube).
-nano petclinic-config
-# paste the content of kubeconfig file and save it.
-chmod 400 petclinic-config
-export KUBECONFIG=/home/ec2-user/.kube/petclinic-config
-# test the kubectl with petclinic namespaces
-kubectl get ns
-```
-
 * Install the `cert-manager` on petclinic cluster. See [Cert-Manager info](https://cert-manager.io/docs/).
 
   * Create the namespace for cert-manager
@@ -4477,7 +4483,7 @@ kubectl get ns
   * Install the `Custom Resource Definition` resources separately
 
   ```bash
-  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
+  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.crds.yaml
   ```
 
   * Install the cert-manager Helm chart
@@ -4486,7 +4492,7 @@ kubectl get ns
   helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --version v1.10.0
+  --version v1.11.0
   ```
 
   * Verify that the cert-manager is deployed correctly.
@@ -4522,9 +4528,19 @@ spec:
 * Check if `ClusterIssuer` resource is created.
 
 ```bash
-kubectl apply -f k8s/tls-cluster-issuer-prod.yml
+kubectl apply -f tls-cluster-issuer-prod.yml
 kubectl get clusterissuers letsencrypt-prod -n cert-manager -o wide
 ```
+
+- To manage EKS cluster from Rancher, start Rancher server and login.
+
+- Next, attach policies `AmazonEKSClusterPolicy`, `AmazonEKSServicePolicy`, `AmazonEKS_CNI_Policy`, `AmazonEKSVPCResourceController`  to Rancher server iam role. (`petclinic-tr-rke-role`)
+
+- To import `petclinic-eks` to Rancher, go to the Rancher dashboard. Select tabs orderly; ``Cluster Management -> Import Existing -> Generic``
+```yml
+Cluster Name: petclinic-eks
+```
+``-> Create -> Registration -> copy kubectl command (Run the kubectl command below on an existing Kubernetes cluster running a supported Kubernetes version to import it into Rancher)``
 
 * Issue production Let’s Encrypt Certificate by annotating and adding the `api-gateway` ingress resource with following through Rancher.
 
@@ -4553,14 +4569,37 @@ git merge feature/msp-29
 git push origin main
 ```
 
-* Run the `Production Pipeline` `petclinic-prod` on Jenkins manually to examine the petclinic application.
-
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## MSP 30 - Monitoring with Prometheus and Grafana
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-* Change the port of Prometheus Service to `9090`, so that Grafana can scrape the data.
+* Change the port of Prometheus Service to `9090` and so that Grafana can scrape the data.
 
 * Create a Kubernetes `NodePort` Service for Prometheus Server on Rancher to expose it.
+
+- Go to the `Service Discovery -> Services -> prometheus -> edit yaml` page and make changes.
+
+```yml
+port: 9090
+nodePort: 30002
+type: NodePort
+```
    
 * Create a Kubernetes `NodePort` Service for Grafana Server on Rancher to expose it.
+
+- Go to the `Service Discovery -> Services -> grafana -> edit yaml` page and make changes.
+
+```yml
+nodePort: 30003
+type: NodePort
+```
+
+- Go to the worker nodes security group and open ports `30002 and 30003` to anywhere.
+
+- Next, go to the browser and view monitoring services.
+
+- Delete  EKS cluster via `eksctl`. It will take a while.
+
+```bash
+eksctl delete cluster -f cluster.yaml
+```
