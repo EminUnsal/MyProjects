@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+   name: my-pv
+spec:
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  resources:
+    requests:
+      storage: 2Gi
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: manual
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-database
+spec:
+  selector:
+    matchLabels:
+      app: my-db
+  template:
+    metadata:
+      labels:
+        app: my-db
+    spec:
+      volumes:
+        - name: my-pvc
+          persistentVolumeClaim:
+            claimName: my-pvc
+      containers:
+      - name: mysql-database
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+          - name: my-pvc
+            mountPath: /var/lib/mysql
+        resources:
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: db_root
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: myconfigmap
+                key: db_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: db_password
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: myconfigmap
+                key: database      
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-db-svc
+spec:
+  selector:
+    app: my-db
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+    # If you set the `spec.type` field to `NodePort` and you want a specific port number,
+    # you can specify a value in the `spec.ports[*].nodePort` field.
+---
+
