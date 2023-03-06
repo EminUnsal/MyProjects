@@ -62,7 +62,7 @@ metadata:
 spec:
   selector:
     app: my-search
-  type: ClusterIP
+  type: NodePort
   ports:
   - nodePort: 30001
     protocol: TCP
