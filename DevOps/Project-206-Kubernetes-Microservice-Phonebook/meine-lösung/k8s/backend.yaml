@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: resultserver
+  name: webserver
 spec:
   selector:
     matchLabels:
-      app: my-result
-  replicas: 4
+      app: webserver
+  replicas: 2
   strategy:
     rollingUpdate:
       maxSurge: 2
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: my-result
+        app: webserver
     spec:
       # initContainers:
         # Init containers are exactly like regular containers, except:
@@ -30,7 +30,7 @@ spec:
             memory: 250Mi
           limits:
             cpu: 250m
-            memory: 250i
+            memory: 250Mi
         ports:
         - containerPort:  80
         env:
@@ -46,7 +46,7 @@ spec:
               key: db_user
         - name: MYSQL_PASSWORD
           valueFrom:
-            configMapKeyRef:
+            secretKeyRef:
               name: mysecret
               key: db_password
         - name: MYSQL_DATABASE
@@ -61,7 +61,7 @@ metadata:
   name: backend-svc
 spec:
   selector:
-    app: my-result
+    app: webserver
   type: NodePort
   ports:
   - nodePort: 30002

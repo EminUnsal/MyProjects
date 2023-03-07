@@ -20,15 +20,15 @@ variable "key-name" {
 }
 
 locals {
-  name = "mehmet"   # change here, optional
+  name = "mehmet"
 }
 
 resource "aws_instance" "master" {
-  ami                  = "ami-08d4ac5b634553e16"
-  instance_type        = "t3a.small"
+  ami                  = "ami-04505e74c0741db8d"
+  instance_type        = "t3a.medium"
   key_name             = var.key-name
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
-  vpc_security_group_ids = [ aws_security_group.tf-k8s-master-sec-gr.id ]
+  security_groups      = ["${local.name}-k8s-master-sec-gr"]
   user_data            = data.template_file.master.rendered
   tags = {
     Name = "${local.name}-kube-master"
@@ -36,11 +36,11 @@ resource "aws_instance" "master" {
 }
 
 resource "aws_instance" "worker" {
-  ami                  = "ami-08d4ac5b634553e16"
+  ami                  = "ami-04505e74c0741db8d"
   instance_type        = "t3a.medium"
   key_name             = var.key-name
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
-  vpc_security_group_ids = [ aws_security_group.tf-k8s-master-sec-gr.id ]
+  security_groups      = ["${local.name}-k8s-master-sec-gr"]
   user_data            = data.template_file.worker.rendered
   tags = {
     Name = "${local.name}-kube-worker"

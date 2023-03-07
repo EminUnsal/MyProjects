@@ -31,8 +31,8 @@ apt update
 apt install -y kubelet=1.25.0-00 kubeadm=1.25.0-00 kubectl=1.25.0-00
 systemctl start kubelet
 systemctl enable kubelet
-kubeadm init --pod-network-cidr=172.16.0.0/16 --ignore-preflight-errors=All
+kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=All
 mkdir -p /home/ubuntu/.kube
 cp -i /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
 chown ubuntu:ubuntu /home/ubuntu/.kube/config
-su - ubuntu -c 'kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml'
+su - ubuntu -c 'kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml'

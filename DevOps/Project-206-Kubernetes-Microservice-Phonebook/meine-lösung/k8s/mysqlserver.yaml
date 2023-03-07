@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: my-db
+  template:
+    metadata:
+      labels:
+        app: my-db
+    spec:
+      volumes:
+        - name: persistent-volume
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+          - name: persistent-volume
+            mountPath: /var/lib/mysql
+        resources:
+        envFrom:
+          - configMapRef:
+              name: envfrom-configmap
+          - secretRef:
+              name: envfrom-secret   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-db-svc
+spec:
+  selector:
+    app: my-db
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+    # If you set the `spec.type` field to `NodePort` and you want a specific port number,
+    # you can specify a value in the `spec.ports[*].nodePort` field.
